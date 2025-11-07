@@ -70,8 +70,8 @@ export default function Index() {
     init();
   }, []);
 
-  const handleNewSale = () => router.push('/sales');
-  const handleAddProduct = () => router.push('/inventory');
+  const handleNewSale = () => router.push('/tabs/sales');
+  const handleAddProduct = () => router.push('/tabs/inventory');
 
   return (
     <View style={styles.container}>

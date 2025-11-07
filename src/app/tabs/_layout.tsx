@@ -1,7 +1,12 @@
-import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import { Slot, Tabs } from 'expo-router';
 import { Home, ShoppingCart, Archive } from 'lucide-react-native';
 
 export default function TabsLayout() {
+  if (Platform.OS === 'android') {
+    return <Slot />;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -15,6 +20,7 @@ export default function TabsLayout() {
           paddingBottom: 8,
           paddingTop: 8,
         },
+        headerShown: false,
         headerStyle: { backgroundColor: '#18181B' },
         headerTintColor: '#fff',
       }}
