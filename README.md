@@ -1,29 +1,35 @@
 # Sabor da Vila App
 
-Aplicativo mobile para gerenciamento de vendas e controle de estoque da lanchonete "Sabor da Vila". O projeto foi criado com Expo + React Native e foca em uma experiência simples e rápida para registrar vendas e gerenciar produtos.
+Aplicativo mobile para gerenciamento de vendas e controle de estoque da lanchonete **Sabor da Vila**.  
+Criado com **Expo + React Native**, o projeto foca em uma experiência simples e rápida para registrar vendas e gerenciar produtos.
 
-## � Principais pontos
-- Navegação por plataforma: Drawer (menu hambúrguer) no Android e abas inferiores no iOS
-- Header customizado com botão de menu (Android)
-- Banco local com SQLite para vendas e estoque
+---
+
+## ✨ Principais pontos
+- Navegação por plataforma: Drawer (menu hambúrguer) no Android e abas inferiores no iOS  
+- Header customizado com botão de menu (Android)  
+- Banco local com SQLite para vendas e estoque  
 
 ---
 
 ## 📸 Screenshots Android
 
-
-![Menu](./assets/screenshots/Screenshot_1762491989.png)
-![Dashboard](./assets/screenshots/Screenshot_1762491996.png)
-![Vendas](./assets/screenshots/Screenshot_1762492004.png)
-![Estoque](./assets/screenshots/Screenshot_1762492068.png)
+<p align="center">
+  <img src="./assets/screenshots/Screenshot_1762491989.png" width="230" alt="Menu" />
+  <img src="./assets/screenshots/Screenshot_1762491996.png" width="230" alt="Dashboard" />
+  <img src="./assets/screenshots/Screenshot_1762492004.png" width="230" alt="Vendas" />
+  <img src="./assets/screenshots/Screenshot_1762492068.png" width="230" alt="Estoque" />
+</p>
 
 ---
 
-## 📸 Screenshots IOS
+## 📸 Screenshots iOS
 
-![Dashboard](./assets/screenshots/Dashboard.jpg)
-![Vendas](./assets/screenshots/Vendas.jpg)
-![Estoque](./assets/screenshots/Estoque.jpg)
+<p align="center">
+  <img src="./assets/screenshots/Dashboard.jpg" width="230" alt="Dashboard iOS" />
+  <img src="./assets/screenshots/Vendas.jpg" width="230" alt="Vendas iOS" />
+  <img src="./assets/screenshots/Estoque.jpg" width="230" alt="Estoque iOS" />
+</p>
 
 ---
 
