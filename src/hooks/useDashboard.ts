@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getAllDashboardMetrics, DashboardMetrics } from '../services/dashboardService';
+import { isWebPlatform, mockDashboardData } from '../utils/platformUtils';
 
 // Types para estados do hook
 interface DashboardState {
@@ -56,6 +57,22 @@ export const useDashboard = (
     }));
 
     try {
+      // Se for web, usar dados mock
+      if (isWebPlatform()) {
+        console.log('🌐 useDashboard: Usando dados mock para web');
+        
+        setState(prev => ({
+          ...prev,
+          data: mockDashboardData as DashboardMetrics,
+          isLoading: false,
+          error: null,
+          lastUpdated: new Date(),
+        }));
+        
+        console.log(`✅ useDashboard: Dados mock carregados para web - Loja ${shopId}`);
+        return;
+      }
+
       const dashboardData = await getAllDashboardMetrics(shopId);
       
       setState(prev => ({

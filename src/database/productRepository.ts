@@ -1,4 +1,6 @@
 import { db } from './database';
+import { isWebPlatform, mockProducts } from '../utils/platformUtils';
+import { mockProductRepository } from './platformWrapper';
 
 export interface Product {
   id: number;
@@ -168,6 +170,11 @@ async function ensureTableStructure() {
 
 // Funções de compatibilidade com o código existente
 export const getAllProducts = () => {
+  if (isWebPlatform()) {
+    console.log('🌐 Mock: Retornando todos os produtos para web');
+    return mockProducts;
+  }
+
   try {
     return db.getAllSync('SELECT * FROM products ORDER BY id DESC;');
   } catch (error) {

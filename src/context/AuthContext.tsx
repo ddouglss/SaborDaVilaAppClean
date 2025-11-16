@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const shopService = new ShopService();
 
   const isAuthenticated = user !== null;
-  const isAdmin = user?.userRole === 'admin';
+  const isAdmin = user?.userRole?.toLowerCase?.() === 'admin';
 
   // Inicializar autenticação ao carregar o app
   useEffect(() => {
@@ -233,7 +233,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     activeShop,
     isLoading,
     isAuthenticated: user !== null,
-    isAdmin: user?.userRole === 'admin',
+    isAdmin: user?.userRole?.toLowerCase?.() === 'admin',
     
     // Ações
     login,

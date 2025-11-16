@@ -1,49 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { Menu } from 'lucide-react-native';
+import { AndroidMenu } from './AndroidMenu';
 
 interface HeaderProps {
   title: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
-  const navigation = useNavigation();
+  const [menuVisible, setMenuVisible] = useState(false);
 
-  const openDrawer = () => {
-    try {
-      // Tenta múltiplas abordagens para abrir o drawer
-      if (navigation.getParent?.()?.openDrawer) {
-        navigation.getParent().openDrawer();
-      } else if (navigation.openDrawer) {
-        // @ts-ignore
-        navigation.openDrawer();
-      } else {
-        // Último recurso: dispatcha ação diretamente
-        navigation.dispatch(DrawerActions.openDrawer());
-      }
-    } catch (error) {
-      console.log('Erro ao abrir drawer:', error);
-      // Fallback: dispatcha ação
-      navigation.dispatch(DrawerActions.openDrawer());
-    }
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  const closeMenu = () => {
+    setMenuVisible(false);
   };
 
   return (
-    <View style={styles.container}>
-      {Platform.OS === 'android' && (
-        <TouchableOpacity 
-          style={styles.leftButton} 
-          onPress={openDrawer} 
-          accessibilityLabel="Abrir menu"
-          accessibilityHint="Toque para abrir o menu lateral"
-        >
-          <Menu size={26} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
+    <>
+      <View style={styles.container}>
+        {Platform.OS === 'android' && (
+          <TouchableOpacity 
+            style={styles.leftButton} 
+            onPress={toggleMenu} 
+            accessibilityLabel="Abrir menu"
+            accessibilityHint="Toque para abrir o menu lateral"
+          >
+            <Menu size={26} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
 
-      <Text style={styles.title}>{title}</Text>
-    </View>
+        <Text style={styles.title}>{title}</Text>
+      </View>
+
+      {/* Menu Modal para Android */}
+      {Platform.OS === 'android' && (
+        <AndroidMenu visible={menuVisible} onClose={closeMenu} />
+      )}
+    </>
   );
 };
 

@@ -1,8 +1,12 @@
 import { Platform } from 'react-native';
 import { Tabs, Stack } from 'expo-router';
-import { Home, ShoppingCart, Archive, Settings, Building, BarChart3 } from 'lucide-react-native';
+import { Home, ShoppingCart, Archive, Settings, Building, BarChart3, Globe } from 'lucide-react-native';
+import { useAuth } from '../../context/AuthContext';
 
+// Layout de Tabs com lógica condicional para Android e iOS
 export default function TabsLayout() {
+  const auth = useAuth();
+  const isAdmin = auth?.isAdmin ?? false;
   if (Platform.OS === 'android') {
     return (
       <Stack screenOptions={{ headerShown: false }}>
@@ -76,6 +80,7 @@ export default function TabsLayout() {
           ),
         }}
       />
+      
       <Tabs.Screen
         name="DebugScreen"
         options={{

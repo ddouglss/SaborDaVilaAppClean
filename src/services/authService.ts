@@ -94,7 +94,8 @@ export class AuthService {
         tipoDocumento: userData.tipoDocumento,
         numeroDocumento: documentoLimpo,
         endereco: userData.endereco.trim(),
-        userRole: userData.userRole || 'user',
+        // Normaliza o papel do usuário: qualquer coisa diferente de 'admin' vira 'user'
+        userRole: (userData.userRole || 'user').toLowerCase() === 'admin' ? 'admin' : 'user',
         senhaHash
       });
 
@@ -128,7 +129,7 @@ export class AuthService {
         return { success: false, message: 'Email ou senha incorretos' };
       }
 
-      // Criar objeto AuthUser (sem senha)
+      // Criar objeto AuthUser (sem senha) normalizando o papel
       const authUser: AuthUser = {
         id: user.id,
         nomeCompleto: user.nomeCompleto,
@@ -136,7 +137,7 @@ export class AuthService {
         tipoDocumento: user.tipoDocumento,
         numeroDocumento: user.numeroDocumento,
         endereco: user.endereco,
-        userRole: user.userRole,
+        userRole: (user.userRole || 'user').toLowerCase() === 'admin' ? 'admin' : 'user',
         dataCriacao: user.dataCriacao
       };
 

@@ -1,9 +1,29 @@
-import * as SQLite from 'expo-sqlite';
+import { Platform } from 'react-native';
 import { DailySales, SalesSummary } from '../types/sales';
 
-const db = SQLite.openDatabaseSync('saborDaVila.db');
+// Só importa SQLite se não for web
+let db: any = null;
+
+if (Platform.OS !== 'web') {
+  try {
+    const SQLite = require('expo-sqlite');
+    db = SQLite.openDatabaseSync('saborDaVila.db');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar SQLite:', error);
+  }
+}
 
 export async function initializeSalesTable() {
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Pulando inicialização da tabela sales');
+    return;
+  }
+
+  if (!db) {
+    console.log('⚠️ Banco SQLite não disponível');
+    return;
+  }
+
   try {
     // Esta função agora apenas verifica se a tabela existe
     // A criação real acontece em database.ts com a estrutura correta
@@ -55,6 +75,15 @@ export async function deleteSale(id: number) {
 
 // 🔹 Total de vendas do dia
 export async function getDailySales(shopId: string): Promise<DailySales> {
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Retornando vendas do dia mock');
+    return { total: 0, items: 0 };
+  }
+
+  if (!db) {
+    return { total: 0, items: 0 };
+  }
+
   try {
     // Primeiro tentar com shopId
     try {
@@ -91,6 +120,15 @@ export async function getDailySales(shopId: string): Promise<DailySales> {
 
 // 🔹 Resumo semanal
 export async function getWeeklySummary(shopId: string): Promise<SalesSummary> {
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Retornando resumo semanal mock');
+    return { total: 150.50, items: 12, avgTicket: 12.54 };
+  }
+
+  if (!db) {
+    return { total: 0, items: 0, avgTicket: 0 };
+  }
+
   try {
     // Primeiro tentar com shopId
     try {

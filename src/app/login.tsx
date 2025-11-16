@@ -56,10 +56,18 @@ export default function LoginScreen() {
       if (result.success) {
         if (result.hasShops) {
           // Usuário tem lojas, redirecionar para o app
-          router.replace('/tabs');
+          if (Platform.OS === 'android') {
+            router.replace('/tabs/index');
+          } else {
+            router.replace('/tabs');
+          }
         } else {
           // Usuário não tem lojas, redirecionar para o app (criará loja automaticamente)
-          router.replace('/tabs');
+          if (Platform.OS === 'android') {
+            router.replace('/tabs/index');
+          } else {
+            router.replace('/tabs');
+          }
         }
       } else {
         Alert.alert('Erro no Login', result.message);

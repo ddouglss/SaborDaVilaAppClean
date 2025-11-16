@@ -3,10 +3,16 @@
  * Usado para testes e demonstração dos KPIs
  */
 
-import { db } from './database';
+import { Platform } from 'react-native';
 import { getProductRepository } from './productRepository';
 
 export const seedDatabase = async (shopId: string) => {
+  // Se for web, apenas simular sucesso
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Simulando população de dados de exemplo');
+    return;
+  }
+
   try {
     console.log(`🌱 Populando banco com dados de exemplo para loja: ${shopId}`);
 
@@ -96,6 +102,13 @@ const addSampleSales = async (shopId: string) => {
       { date: '2025-11-01', product: 'Açúcar Cristal 1kg', itemsSold: 12, total: 35.88 },
     ];
 
+    // Importar db dinamicamente apenas para mobile
+    const { db } = await import('./database');
+    if (!db) {
+      console.log('⚠️ Database não disponível');
+      return;
+    }
+
     let insertedSales = 0;
     for (const sale of salesData) {
       try {
@@ -117,17 +130,24 @@ const addSampleSales = async (shopId: string) => {
 };
 
 export const clearSampleData = async (shopId: string) => {
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Simulando limpeza de dados de exemplo');
+    return;
+  }
+
   try {
     console.log('🧹 Limpando dados de exemplo...');
     
-    // Remover vendas
-    db.runSync('DELETE FROM sales WHERE shopId = ?', [shopId]);
-    
-    // Remover produtos
-    db.runSync('DELETE FROM products WHERE shopId = ?', [shopId]);
-    
-    console.log('✅ Dados de exemplo removidos');
-    
+    const { db } = await import('./database');
+    if (db) {
+      // Remover vendas
+      db.runSync('DELETE FROM sales WHERE shopId = ?', [shopId]);
+      
+      // Remover produtos
+      db.runSync('DELETE FROM products WHERE shopId = ?', [shopId]);
+      
+      console.log('✅ Dados de exemplo removidos');
+    }
   } catch (error) {
     console.error('❌ Erro ao limpar dados de exemplo:', error);
   }

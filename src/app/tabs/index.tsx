@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Header } from '../../components/Header';
@@ -30,7 +31,12 @@ export default function Index() {
   }, [activeShop?.id]);
 
   useEffect(() => {
-    // Inicialização do banco
+    // Inicialização do banco apenas para mobile
+    if (Platform.OS === 'web') {
+      console.log('🌐 Web: Ignorando inicialização de banco');
+      return;
+    }
+
     const init = async () => {
       try {
         await initializeDatabase();
@@ -85,6 +91,12 @@ export default function Index() {
   };
 
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      console.log('🌐 Web: Carregando dados simulados');
+      loadData(); // só carregar dados para web
+      return;
+    }
+
     const init = async () => {
       await initializeSalesTable();
       await initializeDatabase();

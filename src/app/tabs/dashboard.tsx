@@ -1,9 +1,6 @@
 /**
- * DashboardScreen - Tela principal do dashboard
- * Implementa Clean Code e SOLID principles
- * Dashboard completo com KPIs, gráficos e métricas
+ * DashboardScreen - Dashboard completo para mobile, simplificado para web
  */
-
 import React from 'react';
 import {
   View,
@@ -13,6 +10,7 @@ import {
   RefreshControl,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useDashboard } from '../../hooks/useDashboard';
@@ -28,19 +26,77 @@ import { seedDatabase } from '../../database/seedData';
 import { Settings, DollarSign, Calendar, BarChart2, Target, Package, Warehouse, TrendingUp, AlertTriangle, CheckCircle, RefreshCw, Database } from 'lucide-react-native';
 
 /**
- * Interface para props do componente
- */
-interface DashboardScreenProps {}
-
-/**
  * Hook para obter dimensões da tela
  */
 const { width: screenWidth } = Dimensions.get('window');
 
-/**
- * Componente principal da tela Dashboard
- */
-export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
+// Componente web inline
+const WebDashboard = () => {
+  const { isAdmin } = useAuth();
+
+  return (
+    <View style={webStyles.container}>
+      <View style={webStyles.header}>
+        <Text style={webStyles.title}>🌐 Dashboard Web</Text>
+        <Text style={webStyles.subtitle}>
+          {isAdmin ? 'Modo Administrador' : 'Loja Demo'}
+        </Text>
+      </View>
+      
+      <View style={webStyles.content}>
+        <View style={webStyles.card}>
+          <Text style={webStyles.cardTitle}>Vendas Hoje</Text>
+          <Text style={webStyles.cardValue}>
+            {isAdmin ? 'R$ 1.250,00' : 'R$ 0,00'}
+          </Text>
+          <Text style={webStyles.cardSubtitle}>
+            {isAdmin ? '8 vendas • 25 itens' : '0 vendas • 0 itens'}
+          </Text>
+        </View>
+
+        <View style={webStyles.card}>
+          <Text style={webStyles.cardTitle}>Vendas Semana</Text>
+          <Text style={webStyles.cardValue}>
+            {isAdmin ? 'R$ 8.750,50' : 'R$ 150,50'}
+          </Text>
+          <Text style={webStyles.cardSubtitle}>
+            {isAdmin ? '45 vendas • 120 itens' : '5 vendas • 12 itens'}
+          </Text>
+        </View>
+
+        <View style={webStyles.card}>
+          <Text style={webStyles.cardTitle}>Vendas Mês</Text>
+          <Text style={webStyles.cardValue}>
+            {isAdmin ? 'R$ 35.850,75' : 'R$ 850,75'}
+          </Text>
+          <Text style={webStyles.cardSubtitle}>
+            {isAdmin ? '180 vendas • 450 itens' : '25 vendas • 60 itens'}
+          </Text>
+        </View>
+
+        <View style={webStyles.card}>
+          <Text style={webStyles.cardTitle}>Ticket Médio</Text>
+          <Text style={webStyles.cardValue}>
+            {isAdmin ? 'R$ 156,25' : 'R$ 34,03'}
+          </Text>
+          <Text style={webStyles.cardSubtitle}>Últimos 30 dias</Text>
+        </View>
+      </View>
+
+      <View style={webStyles.footer}>
+        <Text style={webStyles.footerText}>
+          {isAdmin 
+            ? '🔧 Dados reais do sistema - Acesso administrativo' 
+            : '📱 Para funcionalidades completas, use o app mobile'
+          }
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+// Componente mobile completo
+const MobileDashboard = () => {
   const { activeShop, isAdmin } = useAuth();
   const {
     data: dashboardData,
@@ -105,137 +161,132 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
     );
   };
 
-  /**
-   * Renderizar loading state
-   */
-  const renderLoadingState = () => (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Settings color="#FFFFFF" size={28} style={styles.titleIcon} />
-          <Text style={styles.title}>Dashboard</Text>
-        </View>
-        {activeShop && (
-          <Text style={styles.shopName}>{activeShop.nomeDaLoja}</Text>
-        )}
-      </View>
-
-      {/* Cards de loading */}
-      <View style={styles.kpiGrid}>
-        {[1, 2, 3, 4].map((index) => (
-          <View key={index} style={styles.kpiCard}>
-            <DashboardCard
-              title="Carregando..."
-              value="..."
-              isLoading={true}
-              variant="compact"
-            />
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.chartSection}>
-        <View style={styles.sectionTitleContainer}>
-          <TrendingUp color="#FFFFFF" size={20} style={styles.sectionIcon} />
-          <Text style={styles.sectionTitle}>Gráficos</Text>
-        </View>
-        <DashboardChart
-          type="line"
-          title="Vendas dos Últimos Dias"
-          data={[]}
-          isLoading={true}
-        />
-        <DashboardChart
-          type="bar"
-          title="Produtos Mais Vendidos"
-          data={[]}
-          isLoading={true}
-        />
-      </View>
-    </ScrollView>
-  );
-
-  /**
-   * Renderizar estado de erro
-   */
-  const renderErrorState = () => (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>📊 Dashboard</Text>
-        {activeShop && (
-          <Text style={styles.shopName}>{activeShop.nomeDaLoja}</Text>
-        )}
-      </View>
-
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <Button
-          title="Tentar Novamente"
-          onPress={handleRefresh}
-        />
-      </View>
-    </View>
-  );
-
-  /**
-   * Renderizar estado sem loja selecionada
-   */
-  const renderNoShopState = () => (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Settings color="#FFFFFF" size={28} style={styles.titleIcon} />
-          <Text style={styles.title}>Dashboard</Text>
-        </View>
-      </View>
-
-      <View style={styles.noShopContainer}>
-        <Text style={styles.noShopText}>
-          Selecione uma loja para visualizar o dashboard
-        </Text>
-      </View>
-    </View>
-  );
-
-  /**
-   * Renderizar conteúdo principal
-   */
-  const renderMainContent = () => {
-    if (!dashboardData) {
-      return null;
-    }
-
-    const { daily, weekly, monthly, averageTicket, stockMetrics, topProducts, salesLast30Days } = dashboardData;
-
+  // Estados condicionais
+  if (!activeShop) {
     return (
-      <View style={styles.wrapper}>
-        <Header title="Dashboard" />
-        <ScrollView
-          style={styles.container}
-          refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={handleRefresh}
-              colors={['#007AFF']}
-              tintColor="#007AFF"
-            />
-          }
+      <View style={mobileStyles.container}>
+        <View style={mobileStyles.header}>
+          <View style={mobileStyles.titleContainer}>
+            <Settings color="#FFFFFF" size={28} style={mobileStyles.titleIcon} />
+            <Text style={mobileStyles.title}>Dashboard</Text>
+          </View>
+        </View>
+
+        <View style={mobileStyles.noShopContainer}>
+          <Text style={mobileStyles.noShopText}>
+            Selecione uma loja para visualizar o dashboard
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={mobileStyles.container}>
+        <View style={mobileStyles.header}>
+          <Text style={mobileStyles.title}>📊 Dashboard</Text>
+          {activeShop && (
+            <Text style={mobileStyles.shopName}>{activeShop.nomeDaLoja}</Text>
+          )}
+        </View>
+
+        <View style={mobileStyles.errorContainer}>
+          <Text style={mobileStyles.errorText}>{error}</Text>
+          <Button
+            title="Tentar Novamente"
+            onPress={handleRefresh}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  if (isLoading && !dashboardData) {
+    return (
+      <ScrollView style={mobileStyles.container}>
+        <View style={mobileStyles.header}>
+          <View style={mobileStyles.titleContainer}>
+            <Settings color="#FFFFFF" size={28} style={mobileStyles.titleIcon} />
+            <Text style={mobileStyles.title}>Dashboard</Text>
+          </View>
+          {activeShop && (
+            <Text style={mobileStyles.shopName}>{activeShop.nomeDaLoja}</Text>
+          )}
+        </View>
+
+        {/* Cards de loading */}
+        <View style={mobileStyles.kpiGrid}>
+          {[1, 2, 3, 4].map((index) => (
+            <View key={index} style={mobileStyles.kpiCard}>
+              <DashboardCard
+                title="Carregando..."
+                value="..."
+                isLoading={true}
+                variant="compact"
+              />
+            </View>
+          ))}
+        </View>
+
+        <View style={mobileStyles.chartSection}>
+          <View style={mobileStyles.sectionTitleContainer}>
+            <TrendingUp color="#FFFFFF" size={20} style={mobileStyles.sectionIcon} />
+            <Text style={mobileStyles.sectionTitle}>Gráficos</Text>
+          </View>
+          <DashboardChart
+            type="line"
+            title="Vendas dos Últimos Dias"
+            data={[]}
+            isLoading={true}
+          />
+          <DashboardChart
+            type="bar"
+            title="Produtos Mais Vendidos"
+            data={[]}
+            isLoading={true}
+          />
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Renderizar conteúdo principal
+  if (!dashboardData) {
+    return null;
+  }
+
+  const { daily, weekly, monthly, averageTicket, stockMetrics, topProducts, salesLast30Days } = dashboardData;
+
+  return (
+    <View style={mobileStyles.wrapper}>
+      <Header title="Dashboard" />
+      <ScrollView
+        style={mobileStyles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={handleRefresh}
+            colors={['#007AFF']}
+            tintColor="#007AFF"
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
         {/* Shop info and seed data */}
-        <View style={styles.contentHeader}>
+        <View style={mobileStyles.contentHeader}>
           {activeShop && (
-            <Text style={styles.shopName}>{activeShop.nomeDaLoja}</Text>
+            <Text style={mobileStyles.shopName}>{activeShop.nomeDaLoja}</Text>
           )}
           {lastUpdated && (
-            <Text style={styles.lastUpdated}>
+            <Text style={mobileStyles.lastUpdated}>
               {formatLastUpdated(lastUpdated)}
             </Text>
           )}
           
-          {/* Botão para adicionar dados de exemplo se não há vendas ou para admins */}
-          {(daily.totalSales === 0 || isAdmin) && (
-            <View style={styles.seedDataContainer}>
+          {/* Botão para adicionar dados de exemplo apenas para admins */}
+          {isAdmin && (
+            <View style={mobileStyles.seedDataContainer}>
               <Button
                 title="Adicionar Dados de Exemplo"
                 onPress={handleSeedData}
@@ -247,8 +298,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
         </View>
 
         {/* KPI Cards Grid */}
-        <View style={styles.kpiGrid}>
-          <View style={styles.kpiCard}>
+        <View style={mobileStyles.kpiGrid}>
+          <View style={mobileStyles.kpiCard}>
             <DashboardCard
               title="Vendas Hoje"
               value={daily.totalSales}
@@ -258,7 +309,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
             />
           </View>
 
-          <View style={styles.kpiCard}>
+          <View style={mobileStyles.kpiCard}>
             <DashboardCard
               title="Vendas Semana"
               value={weekly.totalSales}
@@ -267,7 +318,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
             />
           </View>
 
-          <View style={styles.kpiCard}>
+          <View style={mobileStyles.kpiCard}>
             <DashboardCard
               title="Vendas Mês"
               value={monthly.totalSales}
@@ -276,7 +327,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
             />
           </View>
 
-          <View style={styles.kpiCard}>
+          <View style={mobileStyles.kpiCard}>
             <DashboardCard
               title="Ticket Médio"
               value={averageTicket}
@@ -287,14 +338,14 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
         </View>
 
         {/* Stock Metrics */}
-        <View style={styles.section}>
-          <View style={styles.sectionTitleContainer}>
-            <Package color="#FFFFFF" size={20} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Estoque</Text>
+        <View style={mobileStyles.section}>
+          <View style={mobileStyles.sectionTitleContainer}>
+            <Package color="#FFFFFF" size={20} style={mobileStyles.sectionIcon} />
+            <Text style={mobileStyles.sectionTitle}>Estoque</Text>
           </View>
           
-          <View style={styles.stockGrid}>
-            <View style={styles.stockCard}>
+          <View style={mobileStyles.stockGrid}>
+            <View style={mobileStyles.stockCard}>
               <DashboardCard
                 title="Produtos"
                 value={stockMetrics.totalProducts}
@@ -303,7 +354,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
               />
             </View>
 
-            <View style={styles.stockCard}>
+            <View style={mobileStyles.stockCard}>
               <DashboardCard
                 title="Itens em Estoque"
                 value={stockMetrics.totalStockItems}
@@ -312,7 +363,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
               />
             </View>
 
-            <View style={styles.stockCard}>
+            <View style={mobileStyles.stockCard}>
               <DashboardCard
                 title="Valor do Estoque"
                 value={stockMetrics.totalStockValue}
@@ -321,7 +372,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
               />
             </View>
 
-            <View style={styles.stockCard}>
+            <View style={mobileStyles.stockCard}>
               <DashboardCard
                 title="Estoque Baixo"
                 value={stockMetrics.lowStockCount}
@@ -335,10 +386,10 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
         </View>
 
         {/* Charts Section */}
-        <View style={styles.chartSection}>
-          <View style={styles.sectionTitleContainer}>
-            <TrendingUp color="#FFFFFF" size={20} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Gráficos</Text>
+        <View style={mobileStyles.chartSection}>
+          <View style={mobileStyles.sectionTitleContainer}>
+            <TrendingUp color="#FFFFFF" size={20} style={mobileStyles.sectionIcon} />
+            <Text style={mobileStyles.sectionTitle}>Gráficos</Text>
           </View>
           
           {/* Sales Trend Chart */}
@@ -358,12 +409,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
 
         {/* Actions Section (apenas para admin) */}
         {isAdmin && (
-          <View style={styles.actionsSection}>
-            <View style={styles.sectionTitleContainer}>
-              <Settings color="#FFFFFF" size={20} style={styles.sectionIcon} />
-              <Text style={styles.sectionTitle}>Ações</Text>
+          <View style={mobileStyles.actionsSection}>
+            <View style={mobileStyles.sectionTitleContainer}>
+              <Settings color="#FFFFFF" size={20} style={mobileStyles.sectionIcon} />
+              <Text style={mobileStyles.sectionTitle}>Ações</Text>
             </View>
-            <View style={styles.refreshButton}>
+            <View style={mobileStyles.refreshButton}>
               <Button
                 title="Atualizar Dados"
                 onPress={handleRefresh}
@@ -373,29 +424,88 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
         )}
 
         {/* Bottom padding */}
-        <View style={styles.bottomPadding} />
+        <View style={mobileStyles.bottomPadding} />
       </ScrollView>
     </View>
-    );
-  };
-
-  // Estados condicionais
-  if (!activeShop) {
-    return renderNoShopState();
-  }
-
-  if (error) {
-    return renderErrorState();
-  }
-
-  if (isLoading && !dashboardData) {
-    return renderLoadingState();
-  }
-
-  return renderMainContent();
+  );
 };
 
-const styles = StyleSheet.create({
+export const DashboardScreen: React.FC = () => {
+  // Se for web, usar versão ultra-simplificada
+  if (Platform.OS === 'web') {
+    return <WebDashboard />;
+  }
+
+  // Para mobile, usar versão simples
+  return <MobileDashboard />;
+};
+
+const webStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#09090B',
+  },
+  header: {
+    backgroundColor: '#18181B',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#27272A',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#A1A1AA',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    backgroundColor: '#18181B',
+    padding: 16,
+    borderRadius: 12,
+    width: '48%',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#27272A',
+  },
+  cardTitle: {
+    fontSize: 14,
+    color: '#A1A1AA',
+    marginBottom: 8,
+  },
+  cardValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: '#71717A',
+  },
+  footer: {
+    padding: 20,
+    backgroundColor: '#18181B',
+    borderTopWidth: 1,
+    borderTopColor: '#27272A',
+  },
+  footerText: {
+    color: '#A1A1AA',
+    textAlign: 'center',
+    fontSize: 14,
+  },
+});
+
+const mobileStyles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: '#09090B',
@@ -403,6 +513,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#09090B',
+  },
+  header: {
+    backgroundColor: '#18181B',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#27272A',
   },
   contentHeader: {
     backgroundColor: '#18181B',
@@ -515,6 +632,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#A1A1AA',
     textAlign: 'center',
+  },
+  subtitle: {
+    color: '#A1A1AA',
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
 

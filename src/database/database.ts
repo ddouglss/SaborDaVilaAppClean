@@ -1,22 +1,32 @@
-import * as SQLite from 'expo-sqlite';
-import * as FileSystem from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 
 const DB_NAME = 'saborDaVila.db';
-const DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}`;
 
-// Verificação de plataforma para Android
-let db: SQLite.SQLiteDatabase;
+// Define DB_PATH baseado na plataforma
+let DB_PATH = '';
+if (Platform.OS !== 'web') {
+  try {
+    const FileSystem = require('expo-file-system/legacy');
+    DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}`;
+  } catch (error) {
+    DB_PATH = DB_NAME; // fallback
+  }
+}
 
-try {
-  if (Platform.OS === 'web') {
-    console.warn('⚠️ SQLite não suportado no navegador');
-  } else {
+// Banco de dados - só inicializa se não for web
+let db: any = null;
+
+if (Platform.OS !== 'web') {
+  try {
+    // Import dinâmico apenas para mobile
+    const SQLite = require('expo-sqlite');
     db = SQLite.openDatabaseSync(DB_NAME);
     console.log('✅ Banco SQLite inicializado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao abrir banco SQLite:', error);
   }
-} catch (error) {
-  console.error('❌ Erro ao abrir banco SQLite:', error);
+} else {
+  console.log('🌐 Plataforma web detectada, SQLite não disponível');
 }
 
 export { db };
@@ -30,7 +40,8 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export const initializeDatabase = async () => {
   // Verificar plataforma
   if (Platform.OS === 'web') {
-    console.warn('⚠️ SQLite não suportado no navegador');
+    console.log('🌐 Banco inicializado para web');
+    isInitialized = true;
     return;
   }
 
@@ -449,10 +460,16 @@ const createBasicTables = async () => {
 };
 
 export const resetDatabase = async () => {
+  if (Platform.OS === 'web') {
+    console.log('🌐 Web: Reset simulado');
+    return;
+  }
+
   try {
-    const info = await (FileSystem as any).getInfoAsync(DB_PATH);
+    const FileSystem = require('expo-file-system/legacy');
+    const info = await FileSystem.getInfoAsync(DB_PATH);
     if (info.exists) {
-      await (FileSystem as any).deleteAsync(DB_PATH, { idempotent: true });
+      await FileSystem.deleteAsync(DB_PATH, { idempotent: true });
       console.log('🗑️ Banco removido com sucesso:', DB_PATH);
     } else {
       console.log('ℹ️ Banco não encontrado, nada a remover.');
